@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var multer = require('multer')
+const path = require('path');
 var FTPStorage = require('multer-ftp')
 var cors = require('cors');
 
@@ -11,9 +12,11 @@ var storage = multer.diskStorage({
     cb(null, 'home/ftpuser/ftp/'+req.query.folder)
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' +file.originalname )
+    cb(null,file.originalname )
   }
 })
+
+// Date.now() + '-' +
 
 var upload = multer({ storage: storage }).array('file')
 
@@ -76,6 +79,15 @@ app.post('/upload',function(req, res) {
     })
 
 });
+
+
+app.get('/downloadFile',(req, res) => {
+  var file = req.query.file;
+  var folder = req.query.folder;
+  var fileLocation = path.join('/home/ftpuser/ftp/'+folder,file);
+  console.log("Download from "+fileLocation);
+  res.download(fileLocation, file);
+  });
 
 app.listen(8000, function() {
 
